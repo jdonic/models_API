@@ -88,10 +88,10 @@ class AttributeValueDetailViewTestCase(TestCase):
 class CatalogListViewTestCase(TestCase):
     def setUp(self) -> None:
         self.catalog1 = Catalog.objects.create(
-            id=1, nazev="test catalog 1", products_ids=[1, 2, 3]
+            id=1, nazev="test catalog 1", products_ids="[1, 2, 3]"
         )
         self.catalog2 = Catalog.objects.create(
-            id=2, nazev="test catalog 2", products_ids=[4, 5, 6]
+            id=2, nazev="test catalog 2", products_ids="[4, 5, 6]"
         )
         self.client = APIClient()
 
@@ -107,7 +107,7 @@ class CatalogListViewTestCase(TestCase):
 class CatalogDetailViewTestCase(TestCase):
     def setUp(self) -> None:
         self.catalog = Catalog.objects.create(
-            id=1, nazev="test catalog", products_ids=[1, 2, 3]
+            id=1, nazev="test catalog", products_ids="[1, 2, 3]"
         )
         self.client = APIClient()
 
