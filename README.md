@@ -1,0 +1,1 @@
+A small django app that let's user to import JSON, stores it to models and enables user to view it.
