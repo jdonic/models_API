@@ -39,7 +39,7 @@ class ImportCreateViewTestCase(TestCase):
         )
         self.client = APIClient()
 
-    def test_post_request(self):
+    def test_post_request(self) -> None:
         data = [
             {"AttributeValue": {"id": 1, "hodnota": "test_value"}},
             {"Catalog": {"id": 1, "nazev": "test catalog"}},
@@ -49,3 +49,69 @@ class ImportCreateViewTestCase(TestCase):
         self.assertEqual(response.data, {"received data": data})
         self.assertEqual(AttributeValue.objects.get(id=1).hodnota, "test value")
         self.assertEqual(Catalog.objects.get(id=1).nazev, "test catalog")
+
+
+class AttributeValueListViewTestCase(TestCase):
+    def setUp(self) -> None:
+        self.attribute_value1 = AttributeValue.objects.create(
+            id=1, hodnota="test value 1"
+        )
+        self.attribute_value2 = AttributeValue.objects.create(
+            id=2, hodnota="test value 2"
+        )
+        self.client = APIClient()
+
+    def test_get_request(self) -> None:
+        response = self.client.get("/detail/attribute_value/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data,
+            AttributeValueSerializer(
+                [self.attribute_value1, self.attribute_value2], many=True
+            ).data,
+        )
+
+
+class AttributeValueDetailViewTestCase(TestCase):
+    def setUp(self) -> None:
+        self.attribute_value = AttributeValue.objects.create(id=1, hodnota="test value")
+        self.client = APIClient()
+
+    def test_get_request(self) -> None:
+        response = self.client.get("/detail/attribute_value/1/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data, AttributeValueSerializer(self.attribute_value).data
+        )
+
+
+class CatalogListViewTestCase(TestCase):
+    def setUp(self) -> None:
+        self.catalog1 = Catalog.objects.create(
+            id=1, nazev="test catalog 1", products_ids=[1, 2, 3]
+        )
+        self.catalog2 = Catalog.objects.create(
+            id=2, nazev="test catalog 2", products_ids=[4, 5, 6]
+        )
+        self.client = APIClient()
+
+    def test_get_request(self) -> None:
+        response = self.client.get("/detail/catalog/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.data,
+            CatalogSerializer([self.catalog1, self.catalog2], many=True).data,
+        )
+
+
+class CatalogDetailViewTestCase(TestCase):
+    def setUp(self) -> None:
+        self.catalog = Catalog.objects.create(
+            id=1, nazev="test catalog", products_ids=[1, 2, 3]
+        )
+        self.client = APIClient()
+
+    def test_get_request(self) -> None:
+        response = self.client.get("/detail/catalog/1/")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data, CatalogSerializer(self.catalog).data)
