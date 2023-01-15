@@ -1,3 +1,4 @@
 asgiref==3.6.0
 Django==4.0.8
 sqlparse==0.4.3
+djangorestframework~=3.13.0
