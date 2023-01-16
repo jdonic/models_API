@@ -20,20 +20,27 @@ class ImportCreateView(APIView):
             key = list(item.keys())[0]
 
             if key == "AttributeValue":
-                serializer = AttributeValueSerializer(data=item[key])
-                if serializer.is_valid():
-                    serializer.save()
+                if (
+                    all(k in item[key] for k in ("id", "hodnota"))
+                    and len(item[key]) == 2
+                ):
+                    serializer = AttributeValueSerializer(data=item[key])
+                    if serializer.is_valid():
+                        serializer.save()
 
             if key == "Catalog":
-                print(f"Data je {item[key]}")
-                catalog_data = item[key]
-                if "products_ids" in catalog_data:
-                    catalog_data["products_ids"] = json.dumps(
-                        catalog_data["products_ids"]
-                    )
-                serializer = CatalogSerializer(data=item[key])
-                if serializer.is_valid():
-                    serializer.save()
+                if all(k in item[key] for k in ("id", "nazev")) and len(item[key]) in [
+                    2,
+                    3,
+                ]:
+                    catalog_data = item[key]
+                    if "products_ids" in catalog_data:
+                        catalog_data["products_ids"] = json.dumps(
+                            catalog_data["products_ids"]
+                        )
+                    serializer = CatalogSerializer(data=item[key])
+                    if serializer.is_valid():
+                        serializer.save()
 
         return Response({"received data": request.data})
 
