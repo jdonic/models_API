@@ -1,7 +1,7 @@
 from django.test import TestCase
 from rest_framework.test import APIClient
 from .models import AttributeValue, Catalog
-from .serializers import AttributeValueSerializer, CatalogSerializer
+from django.urls import reverse
 
 
 class AttributeValueTestCase(TestCase):
@@ -75,83 +75,81 @@ class ImportCreateViewTestCase(TestCase):
         self.assertEqual(Catalog.objects.get(id=1).nazev, "test catalog")
 
 
-class AttributeValueListViewTestCase(TestCase):
-    """Test case class for testing the attribute value list view"""
+class DynamicModelListViewTests(TestCase):
+    """Test the DynamicModelListView"""
 
     def setUp(self) -> None:
-        """Setup test data for the test case"""
-        self.attribute_value1 = AttributeValue.objects.create(
-            id=1, hodnota="test value 1"
-        )
-        self.attribute_value2 = AttributeValue.objects.create(
-            id=2, hodnota="test value 2"
-        )
+        """Initialize test client and create test catalog and attribute_value objects"""
         self.client = APIClient()
-
-    def test_get_request(self) -> None:
-        """Test the get request to the attribute value list view"""
-        response = self.client.get("/detail/attribute_value/")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            AttributeValueSerializer(
-                [self.attribute_value1, self.attribute_value2], many=True
-            ).data,
+        self.catalog = Catalog.objects.create(id=1, nazev="Test Catalog")
+        self.attribute_value = AttributeValue.objects.create(
+            id=1, hodnota="Test Attribute Value"
         )
 
+    def test_list_catalog(self) -> None:
+        """Test that a list of catalogs is returned successfully"""
+        response = self.client.get(
+            reverse("dynamic_model_list", kwargs={"model_name": "catalog"})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["id"], 1)
+        self.assertEqual(response.data[0]["nazev"], "Test Catalog")
 
-class AttributeValueDetailViewTestCase(TestCase):
-    """Test case class for testing the attribute value detail view"""
+    def test_list_attribute_value(self) -> None:
+        """Test that a list of attribute_values is returned successfully"""
+        response = self.client.get(
+            reverse("dynamic_model_list", kwargs={"model_name": "attribute_value"})
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data[0]["id"], 1)
+        self.assertEqual(response.data[0]["hodnota"], "Test Attribute Value")
+
+    def test_list_invalid_model(self) -> None:
+        """Test that a 404 is returned when an invalid model name is passed"""
+        response = self.client.get(
+            reverse("dynamic_model_list", kwargs={"model_name": "invalid"})
+        )
+        self.assertEqual(response.status_code, 404)
+
+
+class DynamicModelDetailViewTests(TestCase):
+    """Test the DynamicModelDetailView"""
 
     def setUp(self) -> None:
-        """Setup test data for the test case"""
-        self.attribute_value = AttributeValue.objects.create(id=1, hodnota="test value")
+        """Initialize test client and create test catalog and attribute_value objects"""
         self.client = APIClient()
+        self.catalog = Catalog.objects.create(id=1, nazev="Test Catalog")
+        self.attribute_value = AttributeValue.objects.create(
+            id=1, hodnota="Test Attribute Value"
+        )
 
-    def test_get_request(self) -> None:
-        """Test the get request to the attribute value detail view"""
-        response = self.client.get("/detail/attribute_value/1/")
+    def test_retrieve_catalog(self) -> None:
+        """Test that a catalog object is returned successfully"""
+        response = self.client.get(
+            reverse(
+                "dynamic_model_detail",
+                kwargs={"model_name": "catalog", "pk": self.catalog.pk},
+            )
+        )
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data, AttributeValueSerializer(self.attribute_value).data
+        self.assertEqual(response.data["id"], 1)
+        self.assertEqual(response.data["nazev"], "Test Catalog")
+
+    def test_retrieve_attribute_value(self) -> None:
+        """Test that a attribute_value object is returned successfully"""
+        response = self.client.get(
+            reverse(
+                "dynamic_model_detail",
+                kwargs={"model_name": "attribute_value", "pk": self.attribute_value.id},
+            )
         )
-
-
-class CatalogListViewTestCase(TestCase):
-    """Test case class for testing the catalog list view"""
-
-    def setUp(self) -> None:
-        """Setup test data for the test case"""
-        self.catalog1 = Catalog.objects.create(
-            id=1, nazev="test catalog 1", products_ids="[1, 2, 3]"
-        )
-        self.catalog2 = Catalog.objects.create(
-            id=2, nazev="test catalog 2", products_ids="[4, 5, 6]"
-        )
-        self.client = APIClient()
-
-    def test_get_request(self) -> None:
-        """Test the get request to the catalog list view"""
-        response = self.client.get("/detail/catalog/")
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(
-            response.data,
-            CatalogSerializer([self.catalog1, self.catalog2], many=True).data,
+        self.assertEqual(response.data["id"], 1)
+        self.assertEqual(response.data["hodnota"], "Test Attribute Value")
+
+    def test_retrieve_invalid_model(self) -> None:
+        """Test that a 404 is returned when an invalid model name is passed"""
+        response = self.client.get(
+            reverse("dynamic_model_detail", kwargs={"model_name": "invalid", "pk": 1})
         )
-
-
-class CatalogDetailViewTestCase(TestCase):
-    """Test case class for testing the catalog detail view"""
-
-    def setUp(self) -> None:
-        """Setup test data for the test case"""
-        self.catalog = Catalog.objects.create(
-            id=1, nazev="test catalog", products_ids="[1, 2, 3]"
-        )
-        self.client = APIClient()
-
-    def test_get_request(self) -> None:
-        """Test the get request to the catalog detail view"""
-        response = self.client.get("/detail/catalog/1/")
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.data, CatalogSerializer(self.catalog).data)
+        self.assertEqual(response.status_code, 404)
