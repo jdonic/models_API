@@ -5,28 +5,45 @@ from .serializers import AttributeValueSerializer, CatalogSerializer
 
 
 class AttributeValueTestCase(TestCase):
+    """
+    Test case for the AttributeValue model.
+    """
     def setUp(self) -> None:
         AttributeValue.objects.create(id=1, hodnota="test value")
 
     def test_attribute_value_created(self) -> None:
+        """
+        Test that an AttributeValue instance is created with the correct value.
+        """
         attribute_value = AttributeValue.objects.get(id=1)
         self.assertEqual(attribute_value.hodnota, "test value")
 
     def test_attribute_value_str(self) -> None:
+        """
+        Test the string representation of an AttributeValue instance.
+        """
         attribute_value = AttributeValue.objects.get(id=1)
         self.assertEqual(f"{attribute_value}", "test value")
 
-
 class CatalogTestCase(TestCase):
+    """
+    Test case for the Catalog model.
+    """
     def setUp(self) -> None:
         Catalog.objects.create(id=1, nazev="test catalog", products_ids=[1, 2, 3])
 
     def test_catalog_created(self) -> None:
+        """
+        Test that a Catalog instance is created with the correct name and products_ids.
+        """
         catalog = Catalog.objects.get(id=1)
         self.assertEqual(catalog.nazev, "test catalog")
         self.assertEqual(catalog.products_ids, [1, 2, 3])
 
     def test_catalog_str(self) -> None:
+        """
+        Test the string representation of a Catalog instance.
+        """
         catalog = Catalog.objects.get(id=1)
         self.assertEqual(f"{catalog}", "test catalog")
 

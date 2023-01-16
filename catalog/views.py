@@ -16,10 +16,14 @@ class ImportCreateView(APIView):
     parser_classes = [JSONParser]
 
     def post(self, request: HttpRequest, format: Optional[str] = None) -> None:
+        """
+        Handle POST request to import and create new AttributeValue and Catalog objects.
+        """
         for item in request.data:
             key = list(item.keys())[0]
 
-            if key == "AttributeValue":
+            if key == "attributeValue":
+                # Check if the necessary fields are present in the AttributeValue data
                 if (
                     all(k in item[key] for k in ("id", "hodnota"))
                     and len(item[key]) == 2
@@ -29,6 +33,7 @@ class ImportCreateView(APIView):
                         serializer.save()
 
             if key == "Catalog":
+                # Check if the necessary fields are present in the Catalog data
                 if all(k in item[key] for k in ("id", "nazev")) and len(item[key]) in [
                     2,
                     3,

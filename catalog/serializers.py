@@ -12,6 +12,12 @@ class AttributeValueSerializer(serializers.ModelSerializer):
 
 
 class CatalogSerializer(serializers.ModelSerializer):
+    """
+    Converts the Catalog object to its representation in JSON format.
+    If the products_ids field is None, it will be removed from the representation.
+    Otherwise, it will be converted from a string to a list.
+    """
+
     class Meta:
         model = Catalog
         fields = ("id", "nazev", "products_ids")
