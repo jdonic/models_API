@@ -8,6 +8,7 @@ class AttributeValueTestCase(TestCase):
     """
     Test case for the AttributeValue model.
     """
+
     def setUp(self) -> None:
         AttributeValue.objects.create(id=1, hodnota="test value")
 
@@ -25,10 +26,12 @@ class AttributeValueTestCase(TestCase):
         attribute_value = AttributeValue.objects.get(id=1)
         self.assertEqual(f"{attribute_value}", "test value")
 
+
 class CatalogTestCase(TestCase):
     """
     Test case for the Catalog model.
     """
+
     def setUp(self) -> None:
         Catalog.objects.create(id=1, nazev="test catalog", products_ids=[1, 2, 3])
 
@@ -49,7 +52,10 @@ class CatalogTestCase(TestCase):
 
 
 class ImportCreateViewTestCase(TestCase):
+    """Test case class for testing the import endpoint for creating new objects"""
+
     def setUp(self) -> None:
+        """Setup test data for the test case"""
         self.attribute_value = AttributeValue.objects.create(id=1, hodnota="test value")
         self.catalog = Catalog.objects.create(
             id=1, nazev="test catalog", products_ids=[1, 2, 3]
@@ -57,8 +63,9 @@ class ImportCreateViewTestCase(TestCase):
         self.client = APIClient()
 
     def test_post_request(self) -> None:
+        """Test the post request to the import endpoint"""
         data = [
-            {"AttributeValue": {"id": 1, "hodnota": "test_value"}},
+            {"attributeValue": {"id": 1, "hodnota": "test_value"}},
             {"Catalog": {"id": 1, "nazev": "test catalog"}},
         ]
         response = self.client.post("/import/", data=data, format="json")
@@ -69,7 +76,10 @@ class ImportCreateViewTestCase(TestCase):
 
 
 class AttributeValueListViewTestCase(TestCase):
+    """Test case class for testing the attribute value list view"""
+
     def setUp(self) -> None:
+        """Setup test data for the test case"""
         self.attribute_value1 = AttributeValue.objects.create(
             id=1, hodnota="test value 1"
         )
@@ -79,6 +89,7 @@ class AttributeValueListViewTestCase(TestCase):
         self.client = APIClient()
 
     def test_get_request(self) -> None:
+        """Test the get request to the attribute value list view"""
         response = self.client.get("/detail/attribute_value/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -90,11 +101,15 @@ class AttributeValueListViewTestCase(TestCase):
 
 
 class AttributeValueDetailViewTestCase(TestCase):
+    """Test case class for testing the attribute value detail view"""
+
     def setUp(self) -> None:
+        """Setup test data for the test case"""
         self.attribute_value = AttributeValue.objects.create(id=1, hodnota="test value")
         self.client = APIClient()
 
     def test_get_request(self) -> None:
+        """Test the get request to the attribute value detail view"""
         response = self.client.get("/detail/attribute_value/1/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -103,7 +118,10 @@ class AttributeValueDetailViewTestCase(TestCase):
 
 
 class CatalogListViewTestCase(TestCase):
+    """Test case class for testing the catalog list view"""
+
     def setUp(self) -> None:
+        """Setup test data for the test case"""
         self.catalog1 = Catalog.objects.create(
             id=1, nazev="test catalog 1", products_ids="[1, 2, 3]"
         )
@@ -113,6 +131,7 @@ class CatalogListViewTestCase(TestCase):
         self.client = APIClient()
 
     def test_get_request(self) -> None:
+        """Test the get request to the catalog list view"""
         response = self.client.get("/detail/catalog/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(
@@ -122,13 +141,17 @@ class CatalogListViewTestCase(TestCase):
 
 
 class CatalogDetailViewTestCase(TestCase):
+    """Test case class for testing the catalog detail view"""
+
     def setUp(self) -> None:
+        """Setup test data for the test case"""
         self.catalog = Catalog.objects.create(
             id=1, nazev="test catalog", products_ids="[1, 2, 3]"
         )
         self.client = APIClient()
 
     def test_get_request(self) -> None:
+        """Test the get request to the catalog detail view"""
         response = self.client.get("/detail/catalog/1/")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, CatalogSerializer(self.catalog).data)
