@@ -29,47 +29,42 @@ The project integrates swaggerUI, which enables you to view the structure of the
 
 [http://127.0.0.1:8000/api/schema/swagger-ui/](http://127.0.0.1:8000/api/schema/swagger-ui/)
 
-As you can see there, the `import/` endpoint parses JSON and stores the models in correct format into
+As you can see there, the POST `import/` endpoint parses JSON and stores the models, that are in correct format into
 the database. You can find the import at [http://127.0.0.1:8000/import/](http://127.0.0.1:8000/import/)
 
 The models that will be stored: 
 
 ```
-       {
-	      "AttributeValue": {
-		    "id": 1,
-		    "hodnota": "modrá"
-	      }
-	    }
-```
-```
-    {
-      "Catalog": {
-        "id": 1,
-      }
-    }
-```
-or 
-```
-    {
-      "Catalog": {
-        "id": 1,
-        "products_ids": [
-          1,
-          2,
-          3,
-          5
-        ]
-      }
-    }
+{
+  "AttributeValue": {
+    "id": 1,
+    "hodnota": "modrá"
+  }
+}
+
+{
+  "Catalog": {
+    "id": 1,
+    "nazev": "nazev"
+  }
+}
+
+{
+  "Catalog": {
+    "id": 1,
+    "nazev": "",
+    "products_ids": [1, 2, 3, 5]
+  }
+}
+
 ```
 
-The app also implements 4 GET endpoints:
+The products_ids attribute of Catalog model is optional, but if present must be list otherwise won't be saved.
+Every other model and (Catalog, AttributeValue) in wrong format will be parsed out and not stored.
 
-[http://127.0.0.1:8000/detail/attribute_value/](http://127.0.0.1:8000/detail/attribute_value/) -> Display all data for AttributeValue
+The app also implements 2 GET endpoints:
 
-[http://127.0.0.1:8000/detail/attribute_value/<int:pk>/](http://127.0.0.1:8000/detail/attribute_value/<int:pk>/) -> Display data for AttributeValue with specific id 
+`http://127.0.0.1:8000/detail/<str:model_name>/` -> Display all data for models. Possible values are `attribute_value` and `catalog`
 
-[http://127.0.0.1:8000/detail/catalog/](http://127.0.0.1:8000/detail/catalog/) -> Display all data for Catalog
+`http://127.0.0.1:8000/detail/<str:model_name>/<int:pk>/` -> Display for specific `attribute_value` and `catalog` based on their id.
 
-[http://127.0.0.1:8000/detail/catalog/<int:pk>/](http://127.0.0.1:8000/detail/catalog/<int:pk>/) -> Display data for Catalog with specific id 
