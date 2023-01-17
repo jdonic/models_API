@@ -10,21 +10,21 @@ class AttributeValueTestCase(TestCase):
     """
 
     def setUp(self) -> None:
-        AttributeValue.objects.create(id=1, hodnota="test value")
+        AttributeValue.objects.create(id=1, hodnota="test_value")
 
     def test_attribute_value_created(self) -> None:
         """
         Test that an AttributeValue instance is created with the correct value.
         """
         attribute_value = AttributeValue.objects.get(id=1)
-        self.assertEqual(attribute_value.hodnota, "test value")
+        self.assertEqual(attribute_value.hodnota, "test_value")
 
     def test_attribute_value_str(self) -> None:
         """
         Test the string representation of an AttributeValue instance.
         """
         attribute_value = AttributeValue.objects.get(id=1)
-        self.assertEqual(f"{attribute_value}", "test value")
+        self.assertEqual(f"{attribute_value}", "test_value")
 
 
 class CatalogTestCase(TestCase):
@@ -56,7 +56,7 @@ class ImportCreateViewTestCase(TestCase):
 
     def setUp(self) -> None:
         """Setup test data for the test case"""
-        self.attribute_value = AttributeValue.objects.create(id=1, hodnota="test value")
+        self.attribute_value = AttributeValue.objects.create(id=1, hodnota="test_value")
         self.catalog = Catalog.objects.create(
             id=1, nazev="test catalog", products_ids=[1, 2, 3]
         )
@@ -71,7 +71,7 @@ class ImportCreateViewTestCase(TestCase):
         response = self.client.post("/import/", data=data, format="json")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.data, {"received data": data})
-        self.assertEqual(AttributeValue.objects.get(id=1).hodnota, "test value")
+        self.assertEqual(AttributeValue.objects.get(id=1).hodnota, "test_value")
         self.assertEqual(Catalog.objects.get(id=1).nazev, "test catalog")
 
 

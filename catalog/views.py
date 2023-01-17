@@ -22,7 +22,7 @@ class ImportCreateView(APIView):
         for item in request.data:
             key = list(item.keys())[0]
 
-            if key == "attributeValue":
+            if key == "AttributeValue":
                 # Check if the necessary fields are present in the AttributeValue data
                 if (
                     all(k in item[key] for k in ("id", "hodnota"))
@@ -40,10 +40,13 @@ class ImportCreateView(APIView):
                 ]:
                     catalog_data = item[key]
                     if "products_ids" in catalog_data:
-                        catalog_data["products_ids"] = json.dumps(
-                            catalog_data["products_ids"]
-                        )
-                    serializer = CatalogSerializer(data=item[key])
+                        if isinstance(catalog_data["products_ids"], list):
+                            catalog_data["products_ids"] = json.dumps(
+                                catalog_data["products_ids"]
+                            )
+                        else:
+                            catalog_data["products_ids"] = None
+                    serializer = CatalogSerializer(data=catalog_data)
                     if serializer.is_valid():
                         serializer.save()
 
